@@ -1,111 +1,117 @@
-/*==================================================
+/* ==================================================
   Modules
-  ==================================================*/
+  ================================================== */
 
-require('dotenv').config();
-const axios = require('axios');
-const _ = require('underscore');
-const utility = require('./util');
-const Bottleneck = require('bottleneck');
-const term = require( 'terminal-kit' ).terminal;
-const $indexerHost = 'http://defipulse-indexer-sync-server-staging.us-west-1.elasticbeanstalk.com';
+require('dotenv').config()
+const axios = require('axios')
+const _ = require('underscore')
+const utility = require('./util')
+const Bottleneck = require('bottleneck')
+const term = require('terminal-kit').terminal
+const $indexerHost =
+  'http://defipulse-indexer-sync-server-staging.us-west-1.elasticbeanstalk.com'
 
-/*==================================================
+/* ==================================================
   Helper Methods
-  ==================================================*/
+  ================================================== */
 
-  /**
-   *
-   * @param {Object} any
-   * @returns {boolean}
-   * @private
-   */
-  const _isCallable = (any) => typeof any === 'function';
+/**
+ *
+ * @param {Object} any
+ * @returns {boolean}
+ * @private
+ */
+const _isCallable = (any) => typeof any === 'function'
 
-  /**
-   *
-   * @param {String} key
-   * @param {Object} val
-   * @returns {*}
-   * @private
-   */
-  const _jsonConverter = (key, val) => {
-    if (val && _isCallable(val)) {
-      return `return ${String(val)}`;
-    }
+/**
+ *
+ * @param {String} key
+ * @param {Object} val
+ * @returns {*}
+ * @private
+ */
+const _jsonConverter = (key, val) => {
+  if (val && _isCallable(val)) {
+    return `return ${String(val)}`
+  }
 
-    return val;
-  };
+  return val
+}
 
-  async function POST(endpoint, options) {
-    try {
-      if(options && options.chunk && options[options.chunk.param].length > options.chunk.length) {
-        let chunks = _.chunk(options[options.chunk.param], options.chunk.length);
+async function POST (endpoint, options) {
+  try {
+    if (
+      options &&
+      options.chunk &&
+      options[options.chunk.param].length > options.chunk.length
+    ) {
+      const chunks = _.chunk(
+        options[options.chunk.param],
+        options.chunk.length
+      )
 
-        let ethCallCount = 0;
-        let output = [];
-        let complete = 0;
+      let ethCallCount = 0
+      let output = []
+      let complete = 0
 
-        if(process.env.LOG_PROGRESS == 'true') {
-          progressBar = term.progressBar( {
-            width: 80,
-            title: endpoint,
-            percent: true
-          });
-        }
+      if (process.env.LOG_PROGRESS == 'true') {
+        progressBar = term.progressBar({
+          width: 80,
+          title: endpoint,
+          percent: true
+        })
+      }
 
-      function processRequest(chunk) {
-        return new Promise(async(resolve, reject) => {
+      function processRequest (chunk) {
+        return new Promise(async (resolve, reject) => {
           try {
-            let opts = {
+            const opts = {
               ...options
             }
-            opts[options.chunk.param] = chunk;
+            opts[options.chunk.param] = chunk
 
+            const call = await POST(endpoint, opts)
+            complete++
 
-            let call = await POST(endpoint, opts);
-            complete++;
-
-            if(process.env.LOG_PROGRESS == 'true') {
-              progressBar.update(complete / chunks.length);
+            if (process.env.LOG_PROGRESS == 'true') {
+              progressBar.update(complete / chunks.length)
             }
 
-            if(call.ethCallCount) {
-              ethCallCount += call.ethCallCount;
+            if (call.ethCallCount) {
+              ethCallCount += call.ethCallCount
 
-              if(options.chunk.combine == 'array') {
-                output = [
-                  ...output,
-                  ...call.output
-                ]
-              } else if(options.chunk.combine == 'balances') {
-                output.push(call.output);
+              if (options.chunk.combine == 'array') {
+                output = [...output, ...call.output]
+              } else if (options.chunk.combine == 'balances') {
+                output.push(call.output)
               }
             }
-            resolve();
-          } catch(error) {
-            reject(error);
+            resolve()
+          } catch (error) {
+            reject(error)
           }
-        });
+        })
       }
 
       const limiter = new Bottleneck({
         maxConcurrent: process.env.ADAPTER_CONCURRENCY || 1
-      });
+      })
 
-      await Promise.all(_.map(chunks, (chunk) => {
-        return limiter.schedule(() => {
-          return processRequest(chunk);
-        });
-      }));
+      await Promise.all(
+        _.map(chunks, (chunk) => {
+          return limiter.schedule(() => {
+            return processRequest(chunk)
+          })
+        })
+      )
 
-      if(process.env.LOG_PROGRESS == 'true') {
-        progressBar.update(1);
+      if (process.env.LOG_PROGRESS == 'true') {
+        progressBar.update(1)
       }
 
-      if(options.chunk.combine == 'balances') {
+      if (options.chunk.combine == 'balances') {
         console.log('balances combine')
-        output = utility.sum(output);
+        output = utility.sum(output)
       }
 
       return {
@@ -113,18 +119,18 @@ const $indexerHost = 'http://defipulse-indexer-sync-server-staging.us-west-1.ela
         output
       }
     } else {
-      let url = `${process.env.DEFIPULSE_API_URL}/${process.env.DEFIPULSE_KEY}${endpoint}`;
+      let url = `${process.env.DEFIPULSE_API_URL}/${process.env.DEFIPULSE_KEY}${endpoint}`
 
-      if(process.env.INFURA_KEY) {
-        url = `${url}?infura-key=${process.env.INFURA_KEY}`;
+      if (process.env.INFURA_KEY) {
+        url = `${url}?infura-key=${process.env.INFURA_KEY}`
       }
 
-      let response = await axios.post(url, options);
+      const response = await axios.post(url, options)
 
-      return response.data;
+      return response.data
     }
-  } catch(error) {
-    throw error.response ? error.response.data : error;
+  } catch (error) {
+    throw error.response ? error.response.data : error
   }
 }
 
@@ -137,8 +143,8 @@ const $indexerHost = 'http://defipulse-indexer-sync-server-staging.us-west-1.ela
  * @returns {Promise<*>}
  * @private
  */
-async function _testAdapter(block, timestamp, project, tokenBalanceMap) {
-  project = JSON.stringify(project, _jsonConverter, 2);
+async function _testAdapter (block, timestamp, project, tokenBalanceMap) {
+  project = JSON.stringify(project, _jsonConverter, 2)
 
   try {
     return (
@@ -149,13 +155,13 @@ async function _testAdapter(block, timestamp, project, tokenBalanceMap) {
           block,
           project,
           timestamp,
-          tokenBalanceMap,
+          tokenBalanceMap
         }
       })
-    ).data;
-  } catch(error) {
-    console.error(`Error: ${error.response ? error.response.data : error}`);
-    throw error.response ? error.response.data : error;
+    ).data
+  } catch (error) {
+    console.error(`Error: ${error.response ? error.response.data : error}`)
+    throw error.response ? error.response.data : error
   }
 }
 
@@ -166,21 +172,19 @@ async function _testAdapter(block, timestamp, project, tokenBalanceMap) {
  * @returns {Promise<*>}
  * @private
  */
-async function _testStakingAdapter(timestamp, depositor) {
-
+async function _testStakingAdapter (timestamp, depositor) {
   try {
     return (
       await axios({
         method: 'GET',
-        url: `${$indexerHost}/test-eth2.0-staking?timestamp=${timestamp}&depositor=${depositor}`,
+        url: `${$indexerHost}/test-eth2.0-staking?timestamp=${timestamp}&depositor=${depositor}`
       })
-    ).data;
-  } catch(error) {
-    console.error(`Error: ${error.response ? error.response.data : error}`);
-    throw error.response ? error.response.data : error;
+    ).data
+  } catch (error) {
+    console.error(`Error: ${error.response ? error.response.data : error}`)
+    throw error.response ? error.response.data : error
   }
 }
-
 
 /**
  *
@@ -189,67 +193,87 @@ async function _testStakingAdapter(timestamp, depositor) {
  * @returns {Promise<*>}
  * @private
  */
-async function _lookupBlock(timestamp, chain) {
+async function _lookupBlock (timestamp, chain) {
   try {
     return (
-      await axios.get(`${$indexerHost}/lookup-block?chain=${chain || ''}&&timestamp=${timestamp}`)
-    ).data;
-  } catch(error) {
-    console.error(`Error: ${error.response ? error.response.data : error}`);
-    throw error.response ? error.response.data : error;
+      await axios.get(
+        `${$indexerHost}/lookup-block?chain=${
+          chain || ''
+        }&&timestamp=${timestamp}`
+      )
+    ).data
+  } catch (error) {
+    console.error(`Error: ${error.response ? error.response.data : error}`)
+    throw error.response ? error.response.data : error
   }
 }
 
-  async function erc20(endpoint, options) {
-    return POST(`/erc20/${endpoint}`, options);
-  }
-
-async function eth(endpoint, options) {
-  return POST(`/eth/${endpoint}`, options);
+async function erc20 (endpoint, options) {
+  return POST(`/erc20/${endpoint}`, options)
 }
 
-async function util(endpoint, options) {
-  return POST(`/util/${endpoint}`, options);
+async function eth (endpoint, options) {
+  return POST(`/eth/${endpoint}`, options)
 }
 
-async function abi(endpoint, options) {
-  return POST(`/abi/${endpoint}`, options);
+async function util (endpoint, options) {
+  return POST(`/util/${endpoint}`, options)
 }
 
-async function maker(endpoint, options) {
-  return POST(`/cdp/maker/${endpoint}`, options);
+async function abi (endpoint, options) {
+  return POST(`/abi/${endpoint}`, options)
 }
 
-async function compound(endpoint, options) {
-  return POST(`/cdp/compound/${endpoint}`, options);
+async function maker (endpoint, options) {
+  return POST(`/cdp/maker/${endpoint}`, options)
 }
 
-async function aave(endpoint, options) {
-  return POST(`/cdp/aave/${endpoint}`, options);
+async function compound (endpoint, options) {
+  return POST(`/cdp/compound/${endpoint}`, options)
 }
 
-async function cdp(endpoint, options) {
-  return POST(`/cdp/${endpoint}`, options);
+async function aave (endpoint, options) {
+  return POST(`/cdp/aave/${endpoint}`, options)
 }
 
-/*==================================================
+async function cdp (endpoint, options) {
+  return POST(`/cdp/${endpoint}`, options)
+}
+
+/* ==================================================
   Exportsd
-  ==================================================*/
+  ================================================== */
 
 module.exports = {
   abi: {
     call: (options) => abi('call', { ...options }),
-    multiCall: (options) => abi('multiCall', { ...options, chunk: {param: 'calls', length: 5000, combine: 'array'} })
+    multiCall: (options) =>
+      abi('multiCall', {
+        ...options,
+        chunk: { param: 'calls', length: 5000, combine: 'array' }
+      })
   },
   cdp: {
-    getAssetsLocked: (options) => cdp('getAssetsLocked', { ...options, chunk: {param: 'targets', length: 1000, combine: 'balances'} }),
+    getAssetsLocked: (options) =>
+      cdp('getAssetsLocked', {
+        ...options,
+        chunk: { param: 'targets', length: 1000, combine: 'balances' }
+      }),
     maker: {
       tokens: (options) => maker('tokens', { ...options }),
-      getAssetsLocked: (options) => maker('getAssetsLocked', { ...options, chunk: {param: 'targets', length: 3000, combine: 'balances'} })
+      getAssetsLocked: (options) =>
+        maker('getAssetsLocked', {
+          ...options,
+          chunk: { param: 'targets', length: 3000, combine: 'balances' }
+        })
     },
     compound: {
       tokens: (options) => compound('tokens', { ...options }),
-      getAssetsLocked: (options) => compound('getAssetsLocked', { ...options, chunk: {param: 'targets', length: 1000, combine: 'balances'} })
+      getAssetsLocked: (options) =>
+        compound('getAssetsLocked', {
+          ...options,
+          chunk: { param: 'targets', length: 1000, combine: 'balances' }
+        })
     },
     util: {
       getLogs: (options) => util('getLogs', { ...options }),
@@ -258,7 +282,7 @@ module.exports = {
       kyberTokens: () => util('kyberTokens'),
       getEthCallCount: () => util('getEthCallCount'),
       resetEthCallCount: () => util('resetEthCallCount'),
-      toSymbols: (data, chain=null) => util('toSymbols', { data, chain }),
+      toSymbols: (data, chain = null) => util('toSymbols', { data, chain }),
       unwrap: (options) => util('unwrap', { ...options }),
       lookupBlock: _lookupBlock,
       /**
@@ -269,18 +293,18 @@ module.exports = {
        * @param {Object} tokenBalanceMap
        * @returns {Promise<*>}
        */
-      testAdapter: ((block, timestamp, project, tokenBalanceMap) => {
-        return _testAdapter(block, timestamp, project, tokenBalanceMap);
-      }),
+      testAdapter: (block, timestamp, project, tokenBalanceMap) => {
+        return _testAdapter(block, timestamp, project, tokenBalanceMap)
+      },
       /**
        *
        * @param {Number} timestamp
        * @param {String} depositor
        * @returns {Promise<*>}
        */
-      testStakingAdapter: ((timestamp, depositor) => {
-        return _testStakingAdapter(timestamp, depositor);
-      }),
+      testStakingAdapter: (timestamp, depositor) => {
+        return _testStakingAdapter(timestamp, depositor)
+      },
       /**
        *
        */
@@ -290,10 +314,14 @@ module.exports = {
        * @param {String} str
        * @returns {boolean}
        */
-      isString: (str) => typeof str === 'string',
+      isString: (str) => typeof str === 'string'
     },
     aave: {
-      getAssetsLocked: (options) => aave('getAssetsLocked', { ...options, chunk: {param: 'targets', length: 1000, combine: 'balances'} })
+      getAssetsLocked: (options) =>
+        aave('getAssetsLocked', {
+          ...options,
+          chunk: { param: 'targets', length: 1000, combine: 'balances' }
+        })
     }
   },
   util: {
@@ -303,7 +331,7 @@ module.exports = {
     kyberTokens: () => util('kyberTokens'),
     getEthCallCount: () => util('getEthCallCount'),
     resetEthCallCount: () => util('resetEthCallCount'),
-    toSymbols: (data, chain=null) => util('toSymbols', { data, chain }),
+    toSymbols: (data, chain = null) => util('toSymbols', { data, chain }),
     unwrap: (options) => util('unwrap', { ...options }),
     lookupBlock: (timestamp) => util('lookupBlock', { timestamp }),
     /**
@@ -314,18 +342,18 @@ module.exports = {
      * @param {Object} tokenBalanceMap
      * @returns {Promise<*>}
      */
-    testAdapter: ((block, timestamp, project, tokenBalanceMap) => {
-      return _testAdapter(block, timestamp, project, tokenBalanceMap);
-    }),
+    testAdapter: (block, timestamp, project, tokenBalanceMap) => {
+      return _testAdapter(block, timestamp, project, tokenBalanceMap)
+    },
     /**
      *
      * @param {Number} timestamp
      * @param {String} project
      * @returns {Promise<*>}
      */
-    testStakingAdapter: ((timestamp, depositor) => {
-      return _testStakingAdapter(timestamp, depositor);
-    }),
+    testStakingAdapter: (timestamp, depositor) => {
+      return _testStakingAdapter(timestamp, depositor)
+    },
     /**
      *
      * @param {function} func
@@ -337,17 +365,17 @@ module.exports = {
      * @param {String} str
      * @returns {boolean}
      */
-    isString: (str) => typeof str === 'string',
+    isString: (str) => typeof str === 'string'
   },
   eth: {
     getBalance: (options) => eth('getBalance', options),
-    getBalances: (options) => eth('getBalances', options),
+    getBalances: (options) => eth('getBalances', options)
   },
   erc20: {
     info: (target) => erc20('info', { target }),
     symbol: (target) => erc20('symbol', { target }),
     decimals: (target) => erc20('decimals', { target }),
     totalSupply: (options) => erc20('totalSupply', { ...options }),
-    balanceOf: (options) => erc20('balanceOf', { ...options }),
+    balanceOf: (options) => erc20('balanceOf', { ...options })
   }
 }

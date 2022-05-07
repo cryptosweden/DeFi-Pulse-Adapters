@@ -10,17 +10,17 @@ module.exports = {
         pullFromPools: true,
         abi: {
           inputs: [],
-          name: "collateralCurrency",
+          name: 'collateralCurrency',
           outputs: [
             {
-              internalType: "contract IERC20",
-              name: "",
-              type: "address",
-            },
+              internalType: 'contract IERC20',
+              name: '',
+              type: 'address'
+            }
           ],
-          stateMutability: "view",
-          type: "function",
-        },
+          stateMutability: 'view',
+          type: 'function'
+        }
       },
       holders: {
         pullFromLogs: true,
@@ -28,10 +28,10 @@ module.exports = {
           target: '0x3e532e6222afe9Bcf02DCB87216802c75D5113aE',
           topic: 'NewContractRegistered(address,address,address[])',
           keys: ['topics'],
-          fromBlock: 9937650,
+          fromBlock: 9937650
         },
-        transform: (poolLog) => `0x${poolLog[1].slice(26)}`,
-      },
-    },
-  ],
-};
+        transform: (poolLog) => `0x${poolLog[1].slice(26)}`
+      }
+    }
+  ]
+}

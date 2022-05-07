@@ -29,23 +29,28 @@ const dInterestAddresses = [
   '0x22E6b9A65163CE1225D1F65EF7942a979d093039' // Harvest CRV:RENWBTC
 ]
 const wrappedTokenToSubsitute = {
-  '0x2fE94ea3d5d4a175184081439753DE15AeF9d614': { // CRV:oBTC
+  '0x2fE94ea3d5d4a175184081439753DE15AeF9d614': {
+    // CRV:oBTC
     address: '0x8064d9Ae6cDf087b1bcd5BDf3531bD5d8C537a68', // oBTC
     decimals: 18
   },
-  '0xb19059ebb43466C323583928285a49f558E572Fd': { // CRV:HBTC
+  '0xb19059ebb43466C323583928285a49f558E572Fd': {
+    // CRV:HBTC
     address: '0x0316EB71485b0Ab14103307bf65a021042c6d380', // HBTC
     decimals: 18
   },
-  '0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858': { // CRV:HUSD
+  '0x5B5CFE992AdAC0C9D48E05854B2d91C73a003858': {
+    // CRV:HUSD
     address: '0xdf574c24545e5ffecb9a659c229253d4111d87e1', // HUSD
     decimals: 8
   },
-  '0x06325440D014e39736583c165C2963BA99fAf14E': { // CRV:STETH
+  '0x06325440D014e39736583c165C2963BA99fAf14E': {
+    // CRV:STETH
     address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18
   },
-  '0x49849C98ae39Fff122806C06791Fa73784FB3675': { // CRV:RENWBTC
+  '0x49849C98ae39Fff122806C06791Fa73784FB3675': {
+    // CRV:RENWBTC
     address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     decimals: 8
   }
@@ -96,12 +101,16 @@ async function tvl (timestamp, block) {
       if (wrappedTokenToSubsitute[underlyingTokenAddress]) {
         const substituteInfo = wrappedTokenToSubsitute[underlyingTokenAddress]
         underlyingTokenAddress = substituteInfo.address
-        valueInToken = BigNumber(valueInToken).div(BigNumber(10).pow(18 - substituteInfo.decimals)).integerValue()
+        valueInToken = BigNumber(valueInToken)
+          .div(BigNumber(10).pow(18 - substituteInfo.decimals))
+          .integerValue()
         if (!balances[underlyingTokenAddress]) {
           balances[underlyingTokenAddress] = 0
         }
       }
-      balances[underlyingTokenAddress] = BigNumber(balances[underlyingTokenAddress]).plus(valueInToken)
+      balances[underlyingTokenAddress] = BigNumber(
+        balances[underlyingTokenAddress]
+      ).plus(valueInToken)
     }
   })
 
@@ -169,7 +178,8 @@ async function rates (timestamp, block) {
       const interestRate = BigNumber(interestRateResult.output).div(1e18)
       const poolAddress = interestRateResult.input.target
       const underlyingTokenAddress = poolToUnderlyingToken[poolAddress]
-      const underlyingTokenSymbol = underlyingTokenToSymbol[underlyingTokenAddress]
+      const underlyingTokenSymbol =
+        underlyingTokenToSymbol[underlyingTokenAddress]
 
       rates.lend[underlyingTokenSymbol] = interestRate.times(100).toString()
     }

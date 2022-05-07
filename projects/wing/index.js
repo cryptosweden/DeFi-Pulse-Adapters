@@ -1,21 +1,23 @@
-/*==================================================
+/* ==================================================
   Modules
-  ==================================================*/
+  ================================================== */
 
-const axios = require('axios');
+const axios = require('axios')
 
-/*==================================================
+/* ==================================================
   TVL
-  ==================================================*/
+  ================================================== */
 
-async function tvl(timestamp, block) {
-  const result = await axios.get('https://ethapi.wing.finance/eth/governance/tvl');
-  return result.data;
+async function tvl (timestamp, block) {
+  const result = await axios.get(
+    'https://ethapi.wing.finance/eth/governance/tvl'
+  )
+  return result.data
 }
 
-/*==================================================
+/* ==================================================
   Exports
-  ==================================================*/
+  ================================================== */
 
 module.exports = {
   name: 'Wing Finance (Ethereum)',

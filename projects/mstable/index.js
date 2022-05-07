@@ -1,15 +1,15 @@
-/*==================================================
+/* ==================================================
   Modules
-==================================================*/
+================================================== */
 
-const sdk = require('../../sdk');
+const sdk = require('../../sdk')
 
-/*==================================================
+/* ==================================================
 Settings
-==================================================*/
+================================================== */
 
-const abi_v1 = require('./abi-massetv1.json');
-const abi_v2 = require('./abi-massetv2.json');
+const abi_v1 = require('./abi-massetv1.json')
+const abi_v2 = require('./abi-massetv2.json')
 
 const mUSD_data = {
   version: 1,
@@ -18,14 +18,14 @@ const mUSD_data = {
   start: 0,
   upgrade: 12094376,
   isFPool: false
-};
+}
 const mBTC_data = {
   version: 2,
   addr: '0x945Facb997494CC2570096c74b5F66A3507330a1',
   start: 11840521,
   isFPool: false
 }
-const mAssets = [mUSD_data, mBTC_data];
+const mAssets = [mUSD_data, mBTC_data]
 
 const HBTC_data = {
   version: 2,
@@ -52,62 +52,67 @@ const GUSD_data = {
   isFPool: true
 }
 
-const fPools = [HBTC_data, TBTC_data, BUSD_data, GUSD_data];
+const fPools = [HBTC_data, TBTC_data, BUSD_data, GUSD_data]
 
-/*==================================================
+/* ==================================================
 Main
-==================================================*/
+================================================== */
 
-async function getV1(pool, block) {
+async function getV1 (pool, block) {
   const res = await sdk.api.abi.call({
     block,
     target: pool.v1_addr,
-    abi: abi_v1['getBassets'], pool
-  });
+    abi: abi_v1.getBassets,
+    pool
+  })
 
-  const bAssets = res.output[0];
+  const bAssets = res.output[0]
 
-  const lockedTokens = {};
+  const lockedTokens = {}
 
-  bAssets.forEach(b => {
+  bAssets.forEach((b) => {
     lockedTokens[b[0]] = b[5]
-  });
+  })
 
-  return lockedTokens;
+  return lockedTokens
 }
 
-async function getV2(pool, block) {
+async function getV2 (pool, block) {
   const res = await sdk.api.abi.call({
     block,
     target: pool.addr,
-    abi: abi_v2['getBassets'],
-  });
-  const bAssetPersonal = res.output[0];
-  const bAssetData = res.output[1];
+    abi: abi_v2.getBassets
+  })
+  const bAssetPersonal = res.output[0]
+  const bAssetData = res.output[1]
 
-  const lockedTokens = {};
+  const lockedTokens = {}
 
   bAssetPersonal.forEach((b, i) => {
-    if (pool.isFPool && i == 0) return;
+    if (pool.isFPool && i == 0) return
     lockedTokens[b[0]] = bAssetData[i][1]
-  });
+  })
 
-  return lockedTokens;
+  return lockedTokens
 }
 
-async function tvl(timestamp, block) {
-  const tokens = await Promise.all([...mAssets, ...fPools].filter(m => block > m.start).map(m =>
-    m.version == 2 || m.upgrade < block ? getV2(m, block) : getV1(m, block)
-  ))
+async function tvl (timestamp, block) {
+  const tokens = await Promise.all(
+    [...mAssets, ...fPools]
+      .filter((m) => block > m.start)
+      .map((m) =>
+        m.version == 2 || m.upgrade < block ? getV2(m, block) : getV1(m, block)
+      )
+  )
 
   const reduced = tokens.reduce((p, c) => ({ ...p, ...c }), {})
 
-  return reduced;
+  return reduced
 }
 
-/*==================================================
+/* ==================================================
   Exports
-  ==================================================*/
+  ================================================== */
 
 module.exports = {
   name: 'mStable',

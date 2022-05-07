@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require('axios')
 
 const oldPools = [
   '0x1Daf17e6d1d9ed6aa9Fe9910AE17Be98C2C4e6BA',
@@ -23,8 +23,8 @@ module.exports = {
   /* Project Metadata */
   name: 'Ruler Protocol',
   token: 'RULER',
-  category: 'Lending',      // Allowed values as shown on DefiPulse: 'Derivatives', 'DEXes', 'Lending', 'Payments', 'Assets'
-  start: 1614757648,         // Wednesday, March 3, 2021 7:47:28 AM UTC
+  category: 'Lending', // Allowed values as shown on DefiPulse: 'Derivatives', 'DEXes', 'Lending', 'Payments', 'Assets'
+  start: 1614757648, // Wednesday, March 3, 2021 7:47:28 AM UTC
   /* required for fetching token balances */
   tokenHolderMap: [
     {
@@ -46,15 +46,21 @@ module.exports = {
           type: 'function'
         }
       },
-      holders: '0xF19f4490A7fCCfEf2DaB8199ACDB2Dc1B9027C18',
+      holders: '0xF19f4490A7fCCfEf2DaB8199ACDB2Dc1B9027C18'
     },
     {
-      tokens: ['0x6b175474e89094c44da98b954eedeac495271d0f', '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'], // Dai + 3crv
+      tokens: [
+        '0x6b175474e89094c44da98b954eedeac495271d0f',
+        '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
+      ], // Dai + 3crv
       holders: async () => {
-        const data = await axios.get('https://api.rulerprotocol.com/backend_data/production');
-        return Object.values(data.data.rewards).map(reward => reward.poolAddress).concat(oldPools);
-      },
+        const data = await axios.get(
+          'https://api.rulerprotocol.com/backend_data/production'
+        )
+        return Object.values(data.data.rewards)
+          .map((reward) => reward.poolAddress)
+          .concat(oldPools)
+      }
     }
-  ],
-};
-
+  ]
+}

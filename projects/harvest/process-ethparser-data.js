@@ -1,16 +1,23 @@
-const fs = require('fs');
-const path = require('path');
-const sdk = require('../../sdk');
-const abi = require('./abi.json');
+const fs = require('fs')
+const path = require('path')
+const sdk = require('../../sdk')
+const abi = require('./abi.json')
 
-const { vaults, pools, singleAssetVaults, liquidityPools, oldMooniswapVaults, getVaultByContractName } = require('./config');
+const {
+  vaults,
+  pools,
+  singleAssetVaults,
+  liquidityPools,
+  oldMooniswapVaults,
+  getVaultByContractName
+} = require('./config')
 
-async function getLiquidityPoolInfo(vaultName) {
+async function getLiquidityPoolInfo (vaultName) {
   const vault = getVaultByContractName(vaultName)
 
   const [token0, token1] = await Promise.all([
-    sdk.api.abi.call({ target: vault.underlying.address, abi: abi['token0'] }),
-    sdk.api.abi.call({ target: vault.underlying.address, abi: abi['token1'] })
+    sdk.api.abi.call({ target: vault.underlying.address, abi: abi.token0 }),
+    sdk.api.abi.call({ target: vault.underlying.address, abi: abi.token1 })
   ])
 
   return [
@@ -22,12 +29,12 @@ async function getLiquidityPoolInfo(vaultName) {
   ]
 }
 
-async function main() {
-  let liquidityPoolInfo = {}
+async function main () {
+  const liquidityPoolInfo = {}
 
   const liquidityPoolValues = await Promise.all(
-    [...liquidityPools, ...oldMooniswapVaults].map(
-      (vaultName) => getLiquidityPoolInfo(vaultName)
+    [...liquidityPools, ...oldMooniswapVaults].map((vaultName) =>
+      getLiquidityPoolInfo(vaultName)
     )
   )
 
@@ -35,7 +42,10 @@ async function main() {
     liquidityPoolInfo[val[0]] = val[1]
   })
 
-  fs.writeFileSync(path.resolve(__dirname, 'liquidity-pool-info.json'), JSON.stringify(liquidityPoolInfo));
+  fs.writeFileSync(
+    path.resolve(__dirname, 'liquidity-pool-info.json'),
+    JSON.stringify(liquidityPoolInfo)
+  )
   console.log('done!')
 }
 

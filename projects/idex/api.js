@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require('axios')
 
 const client = axios.create({
   baseURL: 'https://api.idex.io/v1',
@@ -12,8 +12,8 @@ const client = axios.create({
  *
  * @see https://docs.idex.io/#get-assets
  */
-async function getAssets() {
-  const { data } = await client.get('assets');
+async function getAssets () {
+  const { data } = await client.get('assets')
 
   return data
 }

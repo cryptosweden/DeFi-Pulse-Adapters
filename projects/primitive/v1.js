@@ -1,6 +1,6 @@
-/*==================================================
+/* ==================================================
   Modules
-  ==================================================*/
+  ================================================== */
 
 const sdk = require('../../sdk')
 const BigNumber = require('bignumber.js')
@@ -13,20 +13,20 @@ const token0 = require('./abis/token0.json')
 const token1 = require('./abis/token1.json')
 const getReserves = require('./abis/getReserves.json')
 
-/*==================================================
+/* ==================================================
   Addresses
-  ==================================================*/
+  ================================================== */
 
 const START_BLOCK = 11142900
 const REGISTRY = '0x16274044dab9635Df2B5AeAF7CeCb5f381c71680'
 const FACTORY = '0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac'
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-/*==================================================
+/* ==================================================
   TVL
-  ==================================================*/
+  ================================================== */
 
-module.exports = async function tvl(_, block) {
+module.exports = async function tvl (_, block) {
   const supportedTokens = await sdk.api.util
     .tokenList()
     .then((supportedTokens) => supportedTokens.map(({ contract }) => contract))
@@ -39,7 +39,7 @@ module.exports = async function tvl(_, block) {
       toBlock: block,
       target: REGISTRY,
       fromBlock: START_BLOCK,
-      topic: 'DeployedOptionClone(address,address,address)',
+      topic: 'DeployedOptionClone(address,address,address)'
     })
   ).output
 
@@ -51,39 +51,36 @@ module.exports = async function tvl(_, block) {
     .map((log) => `0x${log.topics[3].substring(26)}`)
     .map((redeemAddress) => redeemAddress.toLowerCase())
 
-  const [
-    underlyingAddresses,
-    strikeAddresses,
-    redeemAddresses,
-  ] = await Promise.all([
-    sdk.api.abi
-      .multiCall({
-        abi: getUnderlyingTokenAddress,
-        calls: optionAddresses.map((optionAddress) => ({
-          target: optionAddress,
-        })),
-        block,
-      })
-      .then(({ output }) => output),
-    sdk.api.abi
-      .multiCall({
-        abi: getStrikeTokenAddress,
-        calls: optionAddresses.map((optionAddress) => ({
-          target: optionAddress,
-        })),
-        block,
-      })
-      .then(({ output }) => output),
-    sdk.api.abi
-      .multiCall({
-        abi: redeemToken,
-        calls: optionAddresses.map((optionAddress) => ({
-          target: optionAddress,
-        })),
-        block,
-      })
-      .then(({ output }) => output),
-  ])
+  const [underlyingAddresses, strikeAddresses, redeemAddresses] =
+    await Promise.all([
+      sdk.api.abi
+        .multiCall({
+          abi: getUnderlyingTokenAddress,
+          calls: optionAddresses.map((optionAddress) => ({
+            target: optionAddress
+          })),
+          block
+        })
+        .then(({ output }) => output),
+      sdk.api.abi
+        .multiCall({
+          abi: getStrikeTokenAddress,
+          calls: optionAddresses.map((optionAddress) => ({
+            target: optionAddress
+          })),
+          block
+        })
+        .then(({ output }) => output),
+      sdk.api.abi
+        .multiCall({
+          abi: redeemToken,
+          calls: optionAddresses.map((optionAddress) => ({
+            target: optionAddress
+          })),
+          block
+        })
+        .then(({ output }) => output)
+    ])
 
   const options = {}
   // add underlyingAddresses
@@ -94,7 +91,7 @@ module.exports = async function tvl(_, block) {
       if (supportedTokens.includes(tokenAddress)) {
         const optionAddress = underlyingAddress.input.target.toLowerCase()
         options[optionAddress] = {
-          underlyingAddress: tokenAddress,
+          underlyingAddress: tokenAddress
         }
       }
     }
@@ -108,7 +105,7 @@ module.exports = async function tvl(_, block) {
         const optionAddress = strikeAddress.input.target.toLowerCase()
         options[optionAddress] = {
           ...(options[optionAddress] || {}),
-          strikeAddress: tokenAddress,
+          strikeAddress: tokenAddress
         }
       }
     }
@@ -120,7 +117,7 @@ module.exports = async function tvl(_, block) {
       const optionAddress = redeemAddress.input.target.toLowerCase()
       options[optionAddress] = {
         ...(options[optionAddress] || {}),
-        redeemAddress: tokenAddress,
+        redeemAddress: tokenAddress
       }
     }
   })
@@ -130,9 +127,9 @@ module.exports = async function tvl(_, block) {
     await sdk.api.abi.multiCall({
       abi: getCacheBalances,
       calls: Object.keys(options).map((optionAddress) => ({
-        target: optionAddress,
+        target: optionAddress
       })),
-      block,
+      block
     })
   ).output
 
@@ -145,10 +142,10 @@ module.exports = async function tvl(_, block) {
         target: FACTORY,
         params: [
           options[optionAddress].underlyingAddress,
-          options[optionAddress].redeemAddress,
-        ],
+          options[optionAddress].redeemAddress
+        ]
       })),
-      block,
+      block
     })
   ).output
 
@@ -166,20 +163,20 @@ module.exports = async function tvl(_, block) {
       .multiCall({
         abi: token0,
         calls: optionPairs.map((marketAddress) => ({
-          target: marketAddress,
+          target: marketAddress
         })),
-        block,
+        block
       })
       .then(({ output }) => output),
     sdk.api.abi
       .multiCall({
         abi: token1,
         calls: optionPairs.map((marketAddress) => ({
-          target: marketAddress,
+          target: marketAddress
         })),
-        block,
+        block
       })
-      .then(({ output }) => output),
+      .then(({ output }) => output)
   ])
 
   const pairs = {}
@@ -194,7 +191,7 @@ module.exports = async function tvl(_, block) {
       ) {
         const pairAddress = token0Address.input.target.toLowerCase()
         pairs[pairAddress] = {
-          token0Address: tokenAddress,
+          token0Address: tokenAddress
         }
       }
     }
@@ -211,7 +208,7 @@ module.exports = async function tvl(_, block) {
         const pairAddress = token1Address.input.target.toLowerCase()
         pairs[pairAddress] = {
           ...(pairs[pairAddress] || {}),
-          token1Address: tokenAddress,
+          token1Address: tokenAddress
         }
       }
     }
@@ -222,9 +219,9 @@ module.exports = async function tvl(_, block) {
     await sdk.api.abi.multiCall({
       abi: getReserves,
       calls: Object.keys(pairs).map((pairAddress) => ({
-        target: pairAddress,
+        target: pairAddress
       })),
-      block,
+      block
     })
   ).output
 
