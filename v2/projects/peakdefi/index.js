@@ -1,9 +1,9 @@
 module.exports = {
   /* Project Metadata */
-  name: 'PEAKDEFI',         // Peakdefi
-  token: 'PEAK',            // PEAK token
-  category: 'assets',       // Allowed values as shown on DefiPulse: 'Derivatives', 'DEXes', 'Lending', 'Payments', 'Assets'
-  start: 1607405152,        // Dec-08-2020 05:25:52 PM +UTC
+  name: 'PEAKDEFI', // Peakdefi
+  token: 'PEAK', // PEAK token
+  category: 'assets', // Allowed values as shown on DefiPulse: 'Derivatives', 'DEXes', 'Lending', 'Payments', 'Assets'
+  start: 1607405152, // Dec-08-2020 05:25:52 PM +UTC
   /* required for fetching token balances */
   tokenHolderMap: [
     {
@@ -47,10 +47,10 @@ module.exports = {
         '0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0',
         '0xaAAf91D9b90dF800Df4F55c205fd6989c977E73a',
         '0x0E8d6b471e332F140e7d9dbB99E5E3822F728DA6',
-        '0x960b236A07cf122663c4303350609A66A7B288C0',
+        '0x960b236A07cf122663c4303350609A66A7B288C0'
       ],
-      holders: '0x07cDB44fA1E7eCEb638c12A3451A3Dc9CE1400e4',      // globalFund
-      checkETHBalance: true,
+      holders: '0x07cDB44fA1E7eCEb638c12A3451A3Dc9CE1400e4', // globalFund
+      checkETHBalance: true
     },
     {
       tokens: [
@@ -69,7 +69,7 @@ module.exports = {
         '0x3883f5e181fccaF8410FA61e12b59BAd963fb645'
       ],
       holders: '0xC120C7dB0804ae3AbEB1d5f9c9C70402347B4685',
-      checkETHBalance: true,
+      checkETHBalance: true
     }
-  ],
-};
+  ]
+}

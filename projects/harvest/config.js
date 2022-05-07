@@ -1,7 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('fs')
+const path = require('path')
 
-const vaults = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'ethparser-vaults.json'), 'utf-8')).data;
+const vaults = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, 'ethparser-vaults.json'), 'utf-8')
+).data
 
 const getVaultByContractName = (contractName) => {
   return vaults.find((data) => {
@@ -40,8 +42,8 @@ const singleAssetVaults = [
   'V_USDC_#V1',
   'V_USDT_#V1',
   'V_WBTC',
-  'V_WETH_#V1',
-];
+  'V_WETH_#V1'
+]
 
 const liquidityPools = [
   'V_UNI_WETH_USDT_#V1',
@@ -92,7 +94,7 @@ const liquidityPools = [
   'V_SUSHI_USDC_WETH_#V1',
   'V_UNI_WETH_MCAT20',
   'V_SUSHI_WBTC_WETH_#V1',
-  'V_SUSHI_DAI_WETH_#V3',
+  'V_SUSHI_DAI_WETH_#V3'
 ]
 
 const oldMooniswapVaults = [
@@ -103,16 +105,16 @@ const oldMooniswapVaults = [
 
 // Handle OLD VAULTS which have been updated, yet not reflected in
 // in the ethparser-vaults data.
-function getUnderlyingAddressByVault(vault) {
-  switch(vault.contract.name) {
+function getUnderlyingAddressByVault (vault) {
+  switch (vault.contract.name) {
     case 'V_SUSHI_WBTC_WETH_#V2':
-      return '0xceff51756c56ceffca006cd410b03ffc46dd3a58';
+      return '0xceff51756c56ceffca006cd410b03ffc46dd3a58'
     case 'V_SUSHI_USDC_WETH_#V2':
-      return '0x397ff1542f962076d0bfe58ea045ffa2d347aca0';
+      return '0x397ff1542f962076d0bfe58ea045ffa2d347aca0'
     case 'V_SUSHI_WETH_USDT_#V2':
-      return '0x06da0fd433c1a5d7a4faa01111c044910a184553';
+      return '0x06da0fd433c1a5d7a4faa01111c044910a184553'
     case 'V_SUSHI_DAI_WETH_#V3':
-      return '0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f';
+      return '0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f'
     default:
       return vault.underlying.address
   }
@@ -123,29 +125,29 @@ const curveTokens = {
   BTC: { address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599', decimals: 8 },
   ETH: { address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', decimals: 18 },
   LINK: { address: '0x514910771af9ca656af840dff83e8264ecf986ca', decimals: 18 },
-  EURS: { address: '0xdb25f211ab05b1c97d595516f45794528a807ad8', decimals: 2 },
+  EURS: { address: '0xdb25f211ab05b1c97d595516f45794528a807ad8', decimals: 2 }
 }
 
 // CRV vaults need to be "redirected" so the adapter thinks that their value
 // is in the underlying token
 const curveMappings = {
-  'V_CRV_3': curveTokens.USDC,
-  'V_CRV_a3CRV': curveTokens.USDC,
-  'V_CRV_eursCRV': curveTokens.EURS,
+  V_CRV_3: curveTokens.USDC,
+  V_CRV_a3CRV: curveTokens.USDC,
+  V_CRV_eursCRV: curveTokens.EURS,
   'V_CRV_gusd3CRV_#V1': curveTokens.USDC,
-  'V_CRV_gusd3CRV': curveTokens.USDC,
-  'V_CRV_hCRV': curveTokens.BTC,
-  'V_CRV_husd3CRV': curveTokens.USDC,
-  'V_CRV_linkCRV': curveTokens.LINK,
+  V_CRV_gusd3CRV: curveTokens.USDC,
+  V_CRV_hCRV: curveTokens.BTC,
+  V_CRV_husd3CRV: curveTokens.USDC,
+  V_CRV_linkCRV: curveTokens.LINK,
   'V_CRV_oBTC_sbtcCRV_#V1': curveTokens.BTC,
   'V_CRV_oBTC_sbtcCRV_#V2': curveTokens.BTC,
-  'V_CRV_oBTC_sbtcCRV': curveTokens.BTC,
-  'V_CRV_steCRV': curveTokens.ETH,
-  'V_CRV_tbtc_sbtc': curveTokens.BTC,
-  'V_CRV_usdn3CRV': curveTokens.USDC,
-  'V_CRV_usdp3CRV': curveTokens.USDC,
+  V_CRV_oBTC_sbtcCRV: curveTokens.BTC,
+  V_CRV_steCRV: curveTokens.ETH,
+  V_CRV_tbtc_sbtc: curveTokens.BTC,
+  V_CRV_usdn3CRV: curveTokens.USDC,
+  V_CRV_usdp3CRV: curveTokens.USDC,
   'V_CRV_ust3CRV_#V1': curveTokens.USDC,
-  'V_CRV_ust3CRV': curveTokens.USDC,
+  V_CRV_ust3CRV: curveTokens.USDC
 }
 
 module.exports = {

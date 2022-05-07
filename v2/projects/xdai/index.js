@@ -1,4 +1,4 @@
-const sdk = require('../../../sdk/index');
+const sdk = require('../../../sdk/index')
 
 module.exports = {
   /* Project Metadata */
@@ -18,10 +18,10 @@ module.exports = {
     },
     {
       tokens: async () => {
-        const allTokens = await sdk.api.util.tokenList();
-        return allTokens.map(token => token.contract);
+        const allTokens = await sdk.api.util.tokenList()
+        return allTokens.map((token) => token.contract)
       },
       holders: '0x88ad09518695c6c3712AC10a214bE5109a655671'
     }
-  ],
-};
+  ]
+}

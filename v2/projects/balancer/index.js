@@ -15,7 +15,7 @@ module.exports = {
           keys: ['topics'],
           fromBlock: 9562480
         },
-        transform: null,
+        transform: null
       },
       tokens: {
         pullFromPools: true,
@@ -37,4 +37,4 @@ module.exports = {
       }
     }
   ]
-};
+}

@@ -4,7 +4,7 @@ Welcome to the DeFiPulse Project Template Repository! This purpose of this repo 
 
 # How to Get Listed on DeFi Pulse
 
-- FIRST, You must successfully apply and be listed on The DeFi List: 
+- FIRST, You must successfully apply and be listed on The DeFi List:
   Please follow the instructions in this blog post to be listed on The DeFi List: https://defipulse.com/blog/how-to-join-the-defi-pulse-leaderboard.
 - Once your project has been added to the DeFi List, please follow Step 4 in the blog post link above.
 - Code an adapter as described below.
@@ -30,7 +30,7 @@ Next you'll need to create a `.env` file. An example file `.env.example` is prov
 DEFIPULSE_KEY='SDK_KEY_HERE'
 ```
 
-You'll obtain your SDK key in the course of the listing process described above. Each project using the SDK requires an individual SDK key so that we can keep tabs on the web3 call volume each adapter creates in our back-end. We do not limit the number of web3 calls an adapter can make, but ask projects to optimize their call volume whenever possible. 
+You'll obtain your SDK key in the course of the listing process described above. Each project using the SDK requires an individual SDK key so that we can keep tabs on the web3 call volume each adapter creates in our back-end. We do not limit the number of web3 calls an adapter can make, but ask projects to optimize their call volume whenever possible.
 
 To verify that you have access and everything is working, try running:
 
@@ -41,13 +41,14 @@ npm run test -- --project=_template
 The test should complete successfully.
 
 # GitHub Collaboration
+
 Please fork this repository before you start building your adapter and then work on a topic branch within the forked repo. Like this, you will be able to easily create pull requests against the upstream repo and if needed, you can grant us the right to make commits on your topic branch to update your pull request. Please include the name of your project in the pull request. Further details: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork
 
 # Writing a JSON Configurable Adapter
 
-*Note: We try our best to reduce dependecies on third party APIs (The Graph, projects own TVL endpoints etc). Please utilize the DeFi Pulse SDK when writing your adapter.*
+_Note: We try our best to reduce dependecies on third party APIs (The Graph, projects own TVL endpoints etc). Please utilize the DeFi Pulse SDK when writing your adapter._
 
-Let's take a look at the existing [Loopring](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/v2/projects/loopring) or [Balancer](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/v2/projects/balancer) or [Aave on Polygon](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/chains/polygon/projects/aave) adapters to see a minimal example of how to write and test a JSON Configurable adapter. Each token adapter (on Ethereum mainnet) gets its own sub-directory under `/v2/projects`, with an index.js file containing the main json configurations and settings. Projects that are multichain get their own adapter folder under `/chains/[chain name]/projects/`.  
+Let's take a look at the existing [Loopring](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/v2/projects/loopring) or [Balancer](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/v2/projects/balancer) or [Aave on Polygon](https://github.com/ConcourseOpen/DeFi-Pulse-Adapters/blob/master/chains/polygon/projects/aave) adapters to see a minimal example of how to write and test a JSON Configurable adapter. Each token adapter (on Ethereum mainnet) gets its own sub-directory under `/v2/projects`, with an index.js file containing the main json configurations and settings. Projects that are multichain get their own adapter folder under `/chains/[chain name]/projects/`.
 
 Example: your project is multichain; Ethereum and Polygon. You want to place your Ethereum adapter in `/v2/` and your Polygon adapter in `/chains/polygon/projects/`.
 
@@ -61,6 +62,7 @@ v2
 Feel free to add additional files and folders within your project adapter directly as needed to help organize your code, but most json configurable adapters should be very simple. Please keep all code within your token adapter directory - PR's with modifications or additions outside the scope of your own project usually won't be allowed, and in cases where they are needed will need to be discussed with the DeFi Pulse team in advance.
 
 ## Project Metadata
+
 ```js
 module.exports = {
   /* Metadata */
@@ -73,19 +75,22 @@ module.exports = {
 }
 ```
 
-## The main ```tokenHolderMap``` configurations
+## The main `tokenHolderMap` configurations
 
 The main tokenHolderMap part of the adapter is where you add custom configurations for your adapter. On DeFi Pulse, This tokenHolderMap configuration will be used every hour, with a unix timestamp to automatically fetch token balances locked in your protocol. Please note that project adapters need to be able to run successfully for any point back to a project starting time, not just for recent points. This is necessary both to allow collection of historical data that may exist prior to the release of a newly added project, and for repairing or catching up a projects data history in the event of any errors.
 
 Each item in the tokenHolderMap consists of 2 main parts:
 
-#### ```tokens``` configuration
+#### `tokens` configuration
+
 The tokens property of tokenHolderMap can be a single token, a list of tokens, an executable function that will return a single or a list of tokens, or a json configuration that can be used to pull token information from pool smart contracts.
 
-#### ```holders``` configuration
+#### `holders` configuration
+
 The holders property of tokenHolderMap can be a single holder/vault/pool address, a list of addresses, an executable function that will return a single or a list of addresses, or a json configuration that can be used to pull pool address from pool smart contracts.
 
-#### ```Loopring``` adapter `tokenHolderMap` configuration
+#### `Loopring` adapter `tokenHolderMap` configuration
+
 ```js
 module.exports = {
   ...
@@ -112,9 +117,10 @@ module.exports = {
 }
 ```
 
-Add ```checkETHBalance: true``` code snippet in case your adapter needs to track ETH balances as well. For Polygon or other chains, add ```checkNativeBalance: true``` instead to get your chain's native gas token (e.g. MATIC on Polygon).
+Add `checkETHBalance: true` code snippet in case your adapter needs to track ETH balances as well. For Polygon or other chains, add `checkNativeBalance: true` instead to get your chain's native gas token (e.g. MATIC on Polygon).
 
-#### ```xDai``` adapter `tokenHolderMap` configuration
+#### `xDai` adapter `tokenHolderMap` configuration
+
 ```js
 module.exports = {
   ...
@@ -142,7 +148,8 @@ module.exports = {
 
 In case you need more flexibility add a function instead that will return tokens or holders addresses.
 
-#### ```Balancer``` adapter `tokenHolderMap` configuration
+#### `Balancer` adapter `tokenHolderMap` configuration
+
 ```js
 module.exports = {
   ...
@@ -184,22 +191,23 @@ module.exports = {
 ```
 
 In case your protocol follows factory pattern or is based on AMM model add log configs to pull holder addresses from smart contract events.
-By default we use ```(poolLog) => `0x${poolLog[2].slice(26)}`; ``` this code snippet as log ```transform``` function. Pass a different custom function if you need.
+By default we use `` (poolLog) => `0x${poolLog[2].slice(26)}`;  `` this code snippet as log `transform` function. Pass a different custom function if you need.
 
-N.B. The ```transform``` function does not create closures to it's creation contexts. When executed it will only be able to access it's own local variables, not the ones from the scope in which the function was created. 
-
+N.B. The `transform` function does not create closures to it's creation contexts. When executed it will only be able to access it's own local variables, not the ones from the scope in which the function was created.
 
 ## Testing
 
 While writing your project adapter, you'll need to run the code to check for errors, check for output etc. Some testing commands are provided for this purpose.
 
 Project on Ethereum:
+
 ```
 npm run validate-metadata -- --project=<projectName>
 npm run test-tvl -- --project=<projectName>
 ```
 
 Project on Polygon:
+
 ```
 npm run validate-metadata -- --project=<projectName> --chain=polygon
 npm run test-tvl -- --project=<projectName> --chain=polygon
@@ -209,6 +217,7 @@ Run `validate-metadata` command to check if you have project `Metadata` setup co
 
 sample command: `npm run validate-metadata -- --project=loopring`
 sample output:
+
 ```
 Checking Loopring project adapter metadata
     ✓ has a valid name
@@ -227,6 +236,7 @@ After test command `validate-metadata` passes successfully run `test-tvl`. This 
 
 sample command: `npm run test-tvl -- --project=loopring`
 sample output:
+
 ```
 Loopring project adapter running & output format
     runs for a variety of points at different times
@@ -253,6 +263,7 @@ Loopring project adapter running & output format
 Output of tests are stored in json files under `output/**chain_name**/**project_name**/tvl` and are named based on the time they were run to fetch data for.
 
 In the above example, the output is saved to `output/ethereum/Loopring/tvl/2021-03-08T13:00:00Z.json` since the project is `Loopring`, and the data the test script retrieved is tvl. It's output is shown below:
+
 ```
 {
   "timestamp": 1615208400,
@@ -310,7 +321,6 @@ In the above example, the output is saved to `output/ethereum/Loopring/tvl/2021-
 }
 ```
 
-
 This test suite will only log verbose results and adapter output in the event of a problem.
 
 Once both tests pass successfully your project should appear on [Defipulse Staging](https://test.defipulse.com/) leaderboard. Once you see your project on the leaderboard click on the project to review project tvl chart.
@@ -336,15 +346,15 @@ The main tvl function of a project adapter is where token balances are fetched. 
 ```js
 async function tvl(timestamp, block) {
   let balances = {
-    '0x0000000000000000000000000000000000000000': 1000000000000000000, // ETH
-    '0x6B175474E89094C44Da98b954EedeAC495271d0F': 2000000000000000000  // DAI
+    "0x0000000000000000000000000000000000000000": 1000000000000000000, // ETH
+    "0x6B175474E89094C44Da98b954EedeAC495271d0F": 2000000000000000000, // DAI
   };
 
   return balances;
 }
 ```
 
-In the case of the `_template' adapter, we're just using some hard coded values as token balances to illustrate a minimal implementation.
+In the case of the `\_template' adapter, we're just using some hard coded values as token balances to illustrate a minimal implementation.
 
 For consistency, we treat balances associated with token addresses as raw/wei values (before decimal conversion) and balances associated with token symbols as decimal converted values. Due to the methods most commonly available in core contracts for most projects already on Defi Pulse (and a lack of broad standardization), we've found the most effective solution is for project adapters to work internally with token addresses; symbol conversions are done automatically after the adapter runs;
 
@@ -363,10 +373,13 @@ Your adapter will of course need to actually fetch real values unlike the `_temp
 
 ```js
 async function run(timestamp, block) {
-  let getBalance = await sdk.api.eth.getBalance({target: '0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315', block});
+  let getBalance = await sdk.api.eth.getBalance({
+    target: "0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315",
+    block,
+  });
 
   let balances = {
-    '0x0000000000000000000000000000000000000000': getBalance.output
+    "0x0000000000000000000000000000000000000000": getBalance.output,
   };
 
   let calls = await GenerateCallList(timestamp);
@@ -374,7 +387,7 @@ async function run(timestamp, block) {
   let balanceOfResults = await sdk.api.abi.multiCall({
     block,
     calls,
-    abi: 'erc20:balanceOf'
+    abi: "erc20:balanceOf",
   });
 
   await sdk.util.sumMultiBalanceOf(balances, balanceOfResults);
@@ -386,20 +399,23 @@ async function run(timestamp, block) {
 To retrieve it's locked balances, the `bancor` adapter needs to check a main address for it's ETH balance, as well as check a list of token adapters for specific token balances. An SDK provides standardized methods for querying contracts for values and other common interactions, and wherever possible is the preferred method of retrieving data.
 
 ```js
-const  sdk = require('../../sdk');
+const sdk = require("../../sdk");
 ```
 
 2 methods are utilized for the `bancor` adapter:
 
 ```js
-let getBalance = await sdk.api.eth.getBalance({target: '0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315', block});
+let getBalance = await sdk.api.eth.getBalance({
+  target: "0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315",
+  block,
+});
 ```
 
 ```js
 let balanceOfResults = await sdk.api.abi.multiCall({
   block,
   calls,
-  abi: 'erc20:balanceOf'
+  abi: "erc20:balanceOf",
 });
 ```
 
@@ -417,24 +433,24 @@ Each project adapter needs to export the main run function, in addition to some 
 
 ```js
 module.exports = {
-  name: 'Template Project', // project name
-  token: null,              // null, or token symbol if project has a custom token
-  category: 'assets',       // allowed values as shown on DefiPulse: 'derivatives', 'dexes', 'lending', 'payments', 'assets'
-  start: 1514764800,        // unix timestamp (utc 0) specifying when the project began, or where live data begins
-  tvl                       // tvl adapter
-}
+  name: "Template Project", // project name
+  token: null, // null, or token symbol if project has a custom token
+  category: "assets", // allowed values as shown on DefiPulse: 'derivatives', 'dexes', 'lending', 'payments', 'assets'
+  start: 1514764800, // unix timestamp (utc 0) specifying when the project began, or where live data begins
+  tvl, // tvl adapter
+};
 ```
 
 Here's a look at the `bancor` adapter for a practical example of this:
 
 ```js
 module.exports = {
-  name: 'Bancor',
-  token: 'BNT',
-  category: 'dexes',
-  start: 1501632000,  // 08/02/2017 @ 12:00am (UTC)
-  tvl
-}
+  name: "Bancor",
+  token: "BNT",
+  category: "dexes",
+  start: 1501632000, // 08/02/2017 @ 12:00am (UTC)
+  tvl,
+};
 ```
 
 You can see the effect of these settings on [DeFi Pulse](https://defipulse.com/).
@@ -446,15 +462,17 @@ The project's name and protocol token are simple values shown in the UI and API 
 While writing your adapter, you'll need to run the code to check for errors, check for output etc. Some testing commands are provided for this purpose.
 
 ## Historical CSV view
+
 After running the test suite, a historical CSV is generated containing all tracked tokens and their balances beginning the projects "start" date. You can use this folder to gain better insight into the output of your adapters and verify accuracy.
 
-| timestamp        | date           | block  | ETH  |
-| ------------- |:-------------:| -----:|-----:|
-| 1538006400      | Wed Sep 26 2018 20:00:00 | 6405884 | 22.64 |
-| 1549324800 | Mon Feb 04 2019 19:00:00     | 7175712 |  25452.34 |
-| 1554940800      | Wed Apr 10 2019 20:00:00   | 7543456   |   53152.81 |
+| timestamp  |           date           |   block |      ETH |
+| ---------- | :----------------------: | ------: | -------: |
+| 1538006400 | Wed Sep 26 2018 20:00:00 | 6405884 |    22.64 |
+| 1549324800 | Mon Feb 04 2019 19:00:00 | 7175712 | 25452.34 |
+| 1554940800 | Wed Apr 10 2019 20:00:00 | 7543456 | 53152.81 |
 
 Check the
+
 ```
 /CSV folder
 ```
